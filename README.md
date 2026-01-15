@@ -41,13 +41,19 @@ cd pokedex
 ```
 
 ### 2. Configurar Variables de Entorno
-Cree un archivo llamado `.env` en la raíz del proyecto (al mismo nivel que `docker-compose.yml`) con el siguiente contenido:
+El proyecto incluye una plantilla de configuración segura. Genere su archivo de secretos copiando el ejemplo incluido:
 
-```text
-DEBUG=True
-SECRET_KEY=clave_segura_produccion_oak_lab_v1
-POKEAPI_URL=https://pokeapi.co/api/v2/pokemon
+**En Linux/macOS:**
+```bash
+cp .env.example .env
 ```
+
+**En Windows:**
+```powershell
+copy .env.example .env
+```
+
+*(Opcional: Puede editar el archivo `.env` resultante si necesita cambiar la `SECRET_KEY` o activar el modo `DEBUG`).*
 
 ### 3. Construcción del Contenedor
 Ejecute el siguiente comando para descargar la imagen de Python e instalar las dependencias.
@@ -113,10 +119,11 @@ pokedex/
 ├── Dockerfile              # Definición de la imagen del sistema (Python 3.12 Slim)
 ├── docker-compose.yml      # Orquestación de servicios y volúmenes
 ├── requirements.txt        # Dependencias de Python
-├── .env                    # Variables de entorno (Secretos)
+├── .env.example            # Plantilla de configuración (Repositorio)
+├── .env                    # Variables de entorno (Local/Ignorado)
 └── src/                    # Código Fuente Django
     ├── manage.py
-    ├── db.sqlite3          # Base de datos
+    ├── db.sqlite3          # Base de datos (Generada automáticamente)
     ├── pokedex_project/    # Configuración principal
     └── analysis/           # Aplicación de Análisis
         ├── models.py       # Modelo de datos Pokemon
@@ -142,3 +149,4 @@ docker compose up --build
 ```bash
 docker compose exec web bash
 ```
+

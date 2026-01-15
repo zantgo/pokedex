@@ -1,0 +1,132 @@
+<script>
+    /**
+     * Valida que solo sean números, evita dobles puntos y 
+     * CORTE el texto si supera los 6 caracteres.
+     */
+    function forceNumeric(input) {
+        // 1. Limpieza de caracteres no numéricos
+        let cleanVal = input.value.replace(/[^0-9.]/g, '');
+
+        // 2. Control de doble punto
+        if ((cleanVal.match(/\./g) || []).length > 1) {
+            const parts = cleanVal.split('.');
+            cleanVal = parts.shift() + '.' + parts.join('');
+        }
+
+        // 3. LÍMITE ESTRICTO: Máximo 6 caracteres
+        if (cleanVal.length > 6) {
+            cleanVal = cleanVal.slice(0, 6);
+        }
+
+        // Asignar valor limpio
+        input.value = cleanVal;
+    }
+</script>
+
+<div class="card card-dark mb-4">
+    <div class="card-header border-bottom border-secondary pt-3 pb-2">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-sliders me-2 text-danger"></i>Consola de Filtros</h5>
+            <a href="/" class="btn-reset"><i class="bi bi-x-circle"></i> Limpiar todo</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="GET" action="" class="row g-3">
+            
+            <!-- --- FILA 1: Identificación y Transformación --- -->
+            
+            <!-- 1. Búsqueda por Nombre -->
+            <div class="col-12 col-md-3">
+                <label class="form-label text-secondary small text-uppercase fw-bold">Nombre / Especie</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary"><i class="bi bi-search"></i></span>
+                    <input type="text" name="name" class="form-control form-control-dark" 
+                           placeholder="Ej: Pikachu" value="{{ filters.name }}">
+                </div>
+            </div>
+
+            <!-- 2. Selector de Tipo -->
+            <div class="col-6 col-md-3">
+                <label class="form-label text-secondary small text-uppercase fw-bold">Tipo</label>
+                <select name="type" class="form-select form-select-dark">
+                    <option value="">- Todos -</option>
+                    {% for type in types_options %}
+                        <option value="{{ type }}" {% if filters.type == type %}selected{% endif %}>
+                            {{ type|title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 3. Selector de Función de Transformación -->
+            <div class="col-6 col-md-6">
+                <label class="form-label text-secondary small text-uppercase fw-bold">Transformación de Datos</label>
+                <select name="transform_func" class="form-select form-select-dark">
+                    <option value="invert" {% if filters.transform_func == 'invert' %}selected{% endif %}>Invertir Nombre</option>
+                </select>
+            </div>
+
+            <!-- --- FILA 2: Datos Físicos --- -->
+
+            <!-- 4. Rango de Peso (KG) -->
+            <div class="col-6 col-md-3">
+                <label class="form-label text-secondary small text-uppercase fw-bold">Peso Min (kg)</label>
+                <input type="text" inputmode="decimal" maxlength="6" name="min_weight" class="form-control form-control-dark" 
+                       placeholder="0.0" value="{{ filters.min_weight }}" oninput="forceNumeric(this)">
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label text-secondary small text-uppercase fw-bold">Peso Max (kg)</label>
+                <input type="text" inputmode="decimal" maxlength="6" name="max_weight" class="form-control form-control-dark" 
+                       placeholder="∞" value="{{ filters.max_weight }}" oninput="forceNumeric(this)">
+            </div>
+
+            <!-- 5. Rango de Altura (CM) - CAMBIO AQUI -->
+            <div class="col-6 col-md-3">
+                <label class="form-label text-secondary small text-uppercase fw-bold">Altura Min (cm)</label>
+                <input type="text" inputmode="decimal" maxlength="6" name="min_height" class="form-control form-control-dark" 
+                       placeholder="0" value="{{ filters.min_height }}" oninput="forceNumeric(this)">
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label text-secondary small text-uppercase fw-bold">Altura Max (cm)</label>
+                <input type="text" inputmode="decimal" maxlength="6" name="max_height" class="form-control form-control-dark" 
+                       placeholder="∞" value="{{ filters.max_height }}" oninput="forceNumeric(this)">
+            </div>
+
+            <!-- --- FILA 3: Configuración y Ejecución --- -->
+
+            <!-- 6. Precisión de Rango -->
+            <div class="col-12">
+                <div class="d-flex align-items-center gap-3 border border-secondary rounded p-2 bg-dark-subtle">
+                    <span class="text-secondary small text-uppercase fw-bold ms-2">Modo de Filtro:</span>
+                    
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="range_mode" id="mode_strict" value="strict" 
+                               {% if filters.range_mode != 'inclusive' %}checked{% endif %}>
+                        <label class="form-check-label text-secondary small" for="mode_strict">
+                            Estricto (> / <)
+                        </label>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input type="radio" class="form-check-input" name="range_mode" id="mode_inclusive" value="inclusive"
+                               {% if filters.range_mode == 'inclusive' %}checked{% endif %}>
+                        <label class="form-check-label text-secondary small" for="mode_inclusive">
+                            Inclusivo (≥ / ≤)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón Ejecutar -->
+            <div class="col-12 d-grid">
+                <button type="submit" class="btn btn-danger fw-bold text-uppercase">
+                    <i class="bi bi-lightning-charge-fill"></i> Actualizar Análisis
+                </button>
+            </div>
+            
+            <!-- Campos ocultos para mantener ordenamiento -->
+            <input type="hidden" name="sort" value="{{ filters.current_sort }}">
+            <input type="hidden" name="direction" value="{{ filters.current_dir }}">
+        </form>
+    </div>
+</div>

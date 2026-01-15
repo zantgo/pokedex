@@ -118,3 +118,55 @@ class PokedexViewTest(TestCase):
         
         p_light = next(p for p in pokemons_list if p.name == "light")
         self.assertEqual(p_light.reversed_name, "thgil")
+
+    @patch('analysis.services.PokeService.sync_data')
+    def test_view_resilience_bad_data(self, mock_sync):
+        """
+        Prueba CRÍTICA: Verifica que la vista NO explote (Error 500) cuando
+        llegan valores corruptos como 'None' (string), textos o vacíos.
+        Esto valida el arreglo del ValueError.
+        """
+        mock_sync.return_value = None
+        
+        # Simulamos la URL que causó el error anteriormente
+        params = {
+            'min_weight': 'None',      # El culpable del error anterior
+            'max_weight': 'grandote',  # Texto basura
+            'min_height': '',          # Vacío
+            'max_height': 'None',      # Otro 'None'
+            'range_mode': 'strict'
+        }
+        
+        try:
+            response = self.client.get('/', params)
+            # Si llega aquí y el status es 200, el try/except de la vista funcionó
+            self.assertEqual(response.status_code, 200)
+            
+            # Al fallar la conversión, debería ignorar los filtros y devolver todo
+            # (o lo que corresponda según tu lógica, pero sin error 500)
+            self.assertGreaterEqual(len(response.context['pokemons']), 1)
+            
+        except ValueError:
+            self.fail("La vista lanzó un ValueError con datos sucios. El parche no funciona.")
+
+    @patch('analysis.services.PokeService.sync_data')
+    def test_decimal_inputs(self, mock_sync):
+        """
+        Verifica que los decimales funcionen correctamente ahora que el frontend los permite.
+        """
+        mock_sync.return_value = None
+        
+        # Pokemon con peso 10.5 kg (105 hg en DB)
+        # Creamos uno específico para esta prueba
+        Pokemon.objects.create(pokedex_id=999, name="decimal_mon", types="normal", height=10, weight=105)
+        
+        response = self.client.get('/', {
+            'min_weight': '10.4', # 10.4 kg -> 104 hg
+            'max_weight': '10.6', # 10.6 kg -> 106 hg
+            'range_mode': 'inclusive'
+        })
+        
+        pokemons = response.context['pokemons']
+        nombres = [p.name for p in pokemons]
+        
+        self.assertIn("decimal_mon", nombres)
