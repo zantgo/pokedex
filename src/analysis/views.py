@@ -1,8 +1,9 @@
 from django.shortcuts import render
+from django.http import HttpRequest, HttpResponse
 from .models import Pokemon
 from .services import PokeService
 
-def pokedex_view(request):
+def pokedex_view(request: HttpRequest) -> HttpResponse:
     """
     Controlador principal del Dashboard de Análisis.
     
