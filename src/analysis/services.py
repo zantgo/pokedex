@@ -13,7 +13,7 @@ class PokeService:
     """
     
     @staticmethod
-    def sync_data():
+    def sync_data() -> None:
         """
         Verifica el estado de la base de datos local y realiza una carga inicial
         de datos si existen menos de 50 registros.
@@ -33,7 +33,7 @@ class PokeService:
             return
 
         # Leemos la URL dinámicamente desde settings (.env)
-        api_url = settings.POKEAPI_URL
+        api_url: str = settings.POKEAPI_URL
 
         print(f"--- 📡 Iniciando Sincronización con {api_url} ---")
         
