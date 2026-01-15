@@ -1,0 +1,103 @@
+:root {
+    --oak-red: #E3350D;
+    --oak-dark: #121212;
+    --oak-panel: #1E1E1E;
+    --oak-input: #2D2D2D;
+    --text-main: #E0E0E0;
+}
+
+body {
+    background-color: var(--oak-dark);
+    color: var(--text-main);
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Navbar estilo Sci-Fi */
+.navbar-oak {
+    background: linear-gradient(90deg, #8B0000 0%, var(--oak-red) 100%);
+    box-shadow: 0 4px 15px rgba(220, 10, 45, 0.4);
+    border-bottom: 1px solid #ff5555;
+}
+
+/* Tarjetas Oscuras */
+.card-dark {
+    background-color: var(--oak-panel);
+    border: 1px solid #333;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+/* Inputs Personalizados */
+.form-control-dark, .form-select-dark {
+    background-color: var(--oak-input);
+    border: 1px solid #444;
+    color: #fff;
+}
+.form-control-dark:focus, .form-select-dark:focus {
+    background-color: #363636;
+    border-color: var(--oak-red);
+    color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(220, 10, 45, 0.25);
+}
+
+/* Tabla Estilizada */
+.table-dark-custom {
+    --bs-table-bg: var(--oak-panel);
+    --bs-table-color: var(--text-main);
+    --bs-table-border-color: #333;
+}
+.table-dark-custom tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05); /* Highlight sutil */
+}
+
+/* Detalles Visuales */
+.dna-text {
+    font-family: 'Consolas', monospace;
+    color: #ff6b6b;
+    letter-spacing: 1px;
+}
+.poke-id {
+    color: #888;
+    font-weight: 900;
+    font-size: 0.85rem;
+}
+
+/* Badges de Tipos */
+.badge-type { font-size: 0.7em; text-transform: uppercase; padding: 5px 10px; border-radius: 4px; margin-right: 3px; }
+.type-grass { background: #3E9709; color: white; }
+.type-poison { background: #924892; color: white; }
+.type-fire { background: #F67F0F; color: white; }
+.type-water { background: #0A7ABC; color: white; }
+.type-bug { background: #89960B; color: white; }
+.type-flying { background: #6D5E9C; color: white; }
+.type-normal { background: #8A8A59; color: white; }
+.type-electric { background: #F6C70F; color: #333; }
+.type-default { background: #555; color: white; }
+
+/* Links de Ordenamiento */
+.sort-link {
+    color: var(--text-main);
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.sort-link:hover {
+    color: #fff;
+}
+.sort-icon {
+    font-size: 0.8rem;
+    color: #666;
+}
+.sort-link:hover .sort-icon {
+    color: var(--oak-red);
+}
+
+/* Botón Flotante en Móvil para limpiar filtros */
+.btn-reset {
+    color: #aaa;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+.btn-reset:hover { color: #fff; text-decoration: underline; }
