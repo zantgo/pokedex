@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config  # Import necesario para leer .env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k=0b&+a$wc9(y77(x8dgl+nggf@-m-k8+j^k8fsb3f^v$-$or&'
+# Se lee del .env, si no existe usa la clave insegura por defecto para desarrollo
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-k=0b&+a$wc9(y77(x8dgl+nggf@-m-k8+j^k8fsb3f^v$-$or&')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Se lee del .env y se convierte a booleano
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = []
+# URL de la API (Configuración personalizada solicitada)
+POKEAPI_URL = config('POKEAPI_URL', default='https://pokeapi.co/api/v2/pokemon')
+
+# Permitimos todos los hosts para que Docker responda correctamente
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -59,6 +66,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -116,3 +124,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/6.0/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

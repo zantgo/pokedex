@@ -1,113 +1,116 @@
 # 🧪 Pokedex Analytics Infrastructure
 
-Este proyecto contiene la infraestructura técnica backend y frontend diseñada para el Laboratorio del Profesor Oak. Su objetivo es consumir datos de la PokeAPI, persistirlos en una base de datos local y proveer una interfaz de análisis con filtros avanzados y transformación de datos.
+Este repositorio aloja la infraestructura técnica backend y frontend desarrollada para el Laboratorio del Profesor Oak. El sistema funciona como una plataforma de ingestión, persistencia y análisis de datos biológicos de especímenes Pokémon, implementando patrones de arquitectura modular y contenerización para garantizar la portabilidad y escalabilidad del entorno de desarrollo.
+
+---
+
+## 📚 Documentación de Ingeniería
+
+Para facilitar la navegación técnica y la comprensión de las decisiones de diseño, la documentación se ha modularizado. Consulte los siguientes recursos para una visión profunda del sistema:
+
+| Recurso | Descripción |
+| :--- | :--- |
+| 🏗️ **[Arquitectura del Sistema](./docs/architecture.md)** | Visión general del diseño monolítico, stack tecnológico y diagrama lógico de componentes. |
+| 💾 **[Modelo de Datos](./docs/data_model.md)** | Especificación del esquema de base de datos, tipos de datos y atributos calculados en *runtime*. |
+| 🔄 **[Flujo de Datos](./docs/data_flow.md)** | Ciclo de vida de la información: desde la ingesta de la API externa hasta la renderización en la UI. |
+| 🧠 **[Registro de Decisiones (ADR)](./docs/decisions.md)** | Justificación de decisiones técnicas críticas (SQLite, Sincronización Sincrónica, etc.). |
+| 🛠️ **[Guía de Configuración Manual](./docs/setup.md)** | Instrucciones detalladas de despliegue, mantenimiento y comandos administrativos manuales. |
+
+---
 
 ## 📋 Especificaciones Técnicas
 
-*   **Backend Framework:** Django 4.2+ (Python 3.12)
-*   **Base de Datos:** SQLite (Persistencia local)
-*   **Contenerización:** Docker & Docker Compose
-*   **API Cliente:** Requests (Consumo sincrónico de PokeAPI)
-*   **Arquitectura:** Monolito modularizado (App `analysis`).
+El proyecto se adhiere a estándares modernos de desarrollo Python/Django:
 
-## ⚙️ Prerrequisitos
-
-El proyecto es agnóstico al sistema operativo. Funciona en **Linux, Windows y macOS**.
-
-Requisitos únicos:
-*   [Docker Engine](https://docs.docker.com/engine/install/)
-*   [Docker Compose](https://docs.docker.com/compose/install/)
-
-### 🐧 Nota para usuarios Linux
-Para ejecutar los comandos de Docker sin utilizar `sudo` constantemente, asegúrese de que su usuario pertenezca al grupo `docker`.
-Si no lo ha configurado, ejecute:
-```bash
-sudo usermod -aG docker $USER
-# Requiere cerrar y volver a iniciar sesión para aplicar los cambios.
-```
-*(Si decide no hacer esto, deberá anteponer `sudo` a los comandos `docker compose` a continuación).*
+*   **Backend Framework:** Django 6.0+ (Python 3.12).
+*   **Base de Datos:** SQLite (Persistencia local optimizada para entornos de análisis).
+*   **Contenerización:** Docker & Docker Compose (V2).
+*   **Automatización:** Makefile para estandarización de comandos.
+*   **Ingestión de Datos:** Cliente HTTP `requests` con manejo de sesiones y reintentos.
+*   **Arquitectura:** Monolito modularizado (App `analysis`) siguiendo el patrón MVT.
 
 ---
 
-## 🚀 Instalación y Despliegue
+## 🚀 Despliegue Rápido (Quick Start)
 
-Siga estos pasos estrictamente para levantar el entorno de desarrollo.
+El entorno está totalmente contenerizado y automatizado. Siga estos pasos para iniciar la aplicación.
 
-### 1. Clonar o entrar al directorio
-Navegue hasta la carpeta raíz del proyecto donde se encuentra el archivo `docker-compose.yml`.
+### 1. Configuración Inicial
+Clone el repositorio y configure las variables de entorno.
 
 ```bash
-cd pokedex
-```
-
-### 2. Configurar Variables de Entorno
-El proyecto incluye una plantilla de configuración segura. Genere su archivo de secretos copiando el ejemplo incluido:
-
-**En Linux/macOS:**
-```bash
+# Copiar la plantilla de configuración
 cp .env.example .env
+
+# Nota: .env viene preconfigurado para desarrollo (DEBUG=True).
+# Para producción, es mandatorio rotar la SECRET_KEY.
 ```
 
-**En Windows:**
-```powershell
-copy .env.example .env
-```
-
-*(Opcional: Puede editar el archivo `.env` resultante si necesita cambiar la `SECRET_KEY` o activar el modo `DEBUG`).*
-
-### 3. Construcción del Contenedor
-Ejecute el siguiente comando para descargar la imagen de Python e instalar las dependencias.
+### 2. Ejecución Automatizada (Recomendado)
+El proyecto incluye un `Makefile` para estandarizar el ciclo de vida en Linux, macOS y Windows (WSL/Git Bash).
 
 ```bash
+# Configura entorno, construye imagen, migra BD y levanta el servidor
+make start
+```
+
+El servicio estará disponible en: 👉 **http://localhost:8000**
+
+### 3. Ejecución Manual (Alternativa)
+Si no dispone de `make`, puede utilizar los comandos de Docker Compose directamente:
+
+```bash
+# 1. Construir la imagen del sistema
 docker compose build
-```
 
-### 4. Inicialización de Base de Datos
-Antes de iniciar el servidor, debe aplicar las migraciones para generar la estructura de la base de datos (SQLite).
-
-```bash
+# 2. Inicializar el esquema de base de datos
 docker compose run --rm web python manage.py migrate
-```
 
-### 5. Ejecución del Servidor
-Levante los servicios.
-
-```bash
+# 3. Levantar el servidor
 docker compose up
 ```
 
-Una vez iniciado, el servidor estará disponible en:
-👉 **http://localhost:8000**
+---
+
+## 🔍 Funcionalidades y Reglas de Negocio
+
+El sistema implementa lógica de negocio específica para el filtrado y transformación de datos:
+
+1.  **Sincronización Inteligente:**
+    *   Al inicio, el sistema verifica la integridad de la base de datos local.
+    *   Si existen < 50 registros, se activa el proceso de **Ingesta Sincrónica** desde la PokeAPI para poblar el sistema.
+
+2.  **Motor de Filtros Avanzados:**
+    *   **Filtros Dimensionales:** Búsqueda por rangos de Peso (Kg) y Altura (Cm) con conversión automática de unidades (Input Humano → Almacenamiento API).
+    *   **Modos de Precisión:** El usuario puede alternar entre búsqueda **Estricta** (`>` / `<`) o **Inclusiva** (`≥` / `≤`).
+    *   **Búsqueda Semántica:** Filtrado por tipos parciales (ej: "flying") sobre estructuras de datos desnormalizadas.
+
+3.  **Transformación en Tiempo de Ejecución (Runtime):**
+    *   Generación de atributos calculados (ej: "Nombre Invertido") en la capa de vista para evitar redundancia de datos y demostrar manipulación de strings en memoria.
 
 ---
 
-## 🔍 Funcionalidades y Lógica de Negocio
+## 🧪 Aseguramiento de Calidad (QA)
 
-El sistema implementa estrictamente los requerimientos del Profesor Oak:
+El proyecto incluye una suite de pruebas automatizadas granularizada que cubre modelos, servicios de integración y vistas.
 
-1.  **Persistencia y Sincronización (API):**
-    *   Al acceder a la aplicación, se verifica si la base de datos local tiene registros.
-    *   Si hay menos de 50 registros, el sistema consume automáticamente la PokeAPI y guarda los datos en `db.sqlite3`.
-    *   Esto minimiza el tráfico de red y permite trabajar offline tras la primera carga.
+### Ejecución Simplificada
+```bash
+make test
+```
 
-2.  **Filtros Implementados:**
-    *   **Peso (30-80):** Filtra Pokémon con peso estrictamente mayor a 30 y menor a 80.
-    *   **Tipo Planta:** Identifica todos los Pokémon que contengan el tipo "grass" (incluso si tienen doble tipo).
-    *   **Filtro Combinado:** Identifica Pokémon tipo "flying" que además midan más de 10.
-
-3.  **Transformación de Datos:**
-    *   Se genera una columna calculada "Nombre Invertido" (ej: `bulbasaur` -> `ruasablub`) en tiempo de ejecución (Runtime) para no redundar datos en la DB.
-
----
-
-## 🐧 Solución de Problemas (Linux)
-
-Debido a la naturaleza de Docker en Linux, los archivos creados por el contenedor (como `db.sqlite3` o las migraciones) pueden aparecer como propiedad del usuario `root`.
-
-Si encuentra errores de permisos (`Permission denied`), ejecute el siguiente comando en la raíz del proyecto para recuperar la propiedad de los archivos:
+### Ejecución Granular (Manual)
+Para depurar componentes específicos durante el desarrollo:
 
 ```bash
-sudo chown -R $USER:$USER .
+# Pruebas de Modelos (Persistencia)
+docker compose run --rm web python manage.py test analysis.tests.test_models
+
+# Pruebas de Servicios (Integración API y Mocks)
+docker compose run --rm web python manage.py test analysis.tests.test_services
+
+# Pruebas de Vistas (HTTP, Filtros y Lógica de Negocio)
+docker compose run --rm web python manage.py test analysis.tests.test_views
 ```
 
 ---
@@ -116,37 +119,36 @@ sudo chown -R $USER:$USER .
 
 ```text
 pokedex/
-├── Dockerfile              # Definición de la imagen del sistema (Python 3.12 Slim)
-├── docker-compose.yml      # Orquestación de servicios y volúmenes
-├── requirements.txt        # Dependencias de Python
-├── .env.example            # Plantilla de configuración (Repositorio)
-├── .env                    # Variables de entorno (Local/Ignorado)
-└── src/                    # Código Fuente Django
-    ├── manage.py
-    ├── db.sqlite3          # Base de datos (Generada automáticamente)
-    ├── pokedex_project/    # Configuración principal
-    └── analysis/           # Aplicación de Análisis
-        ├── models.py       # Modelo de datos Pokemon
-        ├── services.py     # Lógica de consumo de API y Persistencia
-        ├── views.py        # Controladores y lógica de filtros
-        └── templates/      # Interfaz de usuario HTML/Bootstrap
+├── Makefile                # Automatización de comandos (Start, Test, Clean)
+├── docs/                   # Hub de documentación técnica
+├── Dockerfile              # Definición de imagen (Python 3.12 Slim)
+├── docker-compose.yml      # Orquestación de servicios
+├── requirements.txt        # Dependencias (Pinned versions)
+├── .env.example            # Plantilla de configuración
+├── src/
+    ├── manage.py           # Entrypoint de Django
+    ├── pokedex_project/    # Configuración del proyecto (Settings, URLs)
+    └── analysis/           # Aplicación principal
+        ├── models.py       # Definición del esquema de datos
+        ├── services.py     # Lógica de negocio e integración externa
+        ├── views.py        # Controladores y orquestación de filtros
+        ├── tests/          # Suite de pruebas unitarias y de integración
+        └── templates/      # Capa de presentación (HTML/Bootstrap)
 ```
 
 ---
 
-## 🛠 Comandos Útiles
+## 🐧 Solución de Problemas (Entornos Linux)
 
-**Detener el servidor:**
-Presione `Ctrl + C` en la terminal donde corre el servidor.
+Debido al manejo de permisos de volúmenes en Docker sobre Linux, los archivos generados (`db.sqlite3`) pueden pertenecer al usuario `root`.
 
-**Reconstruir desde cero:**
-Si modifica el `Dockerfile` o agrega librerías al `requirements.txt`:
+Si encuentra errores de permisos (`Permission denied`), puede corregirlo automáticamente con Make:
+
 ```bash
-docker compose up --build
+make fix-perms
 ```
 
-**Acceder a la terminal del contenedor:**
+O ejecutar el comando manual:
 ```bash
-docker compose exec web bash
+sudo chown -R $USER:$USER .
 ```
-

@@ -1,6 +1,7 @@
 # src/analysis/services.py
 import requests
 import logging
+from django.conf import settings
 from .models import Pokemon
 
 logger = logging.getLogger(__name__)
@@ -10,9 +11,7 @@ class PokeService:
     Fachada para la comunicación con la API externa (PokeAPI) y 
     la persistencia de datos en el sistema local.
     """
-    BASE_URL = "https://pokeapi.co/api/v2/pokemon"
-
-
+    
     @staticmethod
     def sync_data():
         """
@@ -33,10 +32,14 @@ class PokeService:
         if Pokemon.objects.count() >= 50:
             return
 
-        print("--- 📡 Iniciando Sincronización con PokeAPI ---")
+        # Leemos la URL dinámicamente desde settings (.env)
+        api_url = settings.POKEAPI_URL
+
+        print(f"--- 📡 Iniciando Sincronización con {api_url} ---")
         
         try:
-            response = requests.get(f"{PokeService.BASE_URL}?limit=50", timeout=10)
+            # Usamos la variable api_url en lugar de la constante fija
+            response = requests.get(f"{api_url}?limit=50", timeout=10)
             response.raise_for_status()
             results = response.json().get('results', [])
 

@@ -3,6 +3,38 @@ from .models import Pokemon
 from .services import PokeService
 
 def pokedex_view(request):
+    """
+    Controlador principal del Dashboard de Análisis.
+    
+    Orquesta la sincronización de datos, aplica filtros complejos sobre el QuerySet
+    y prepara el contexto para la renderización de la plantilla.
+
+    Query Parameters soportados:
+    ---------------------------
+    name : str
+        Filtro parcial por nombre del Pokémon (insensible a mayúsculas).
+    type : str
+        Filtro por tipo (ej: 'grass', 'poison').
+    min_weight / max_weight : float
+        Rango de peso en Kg.
+    min_height / max_height : float
+        Rango de altura en Cm.
+    range_mode : str ('strict' | 'inclusive')
+        Define si los rangos numéricos incluyen los límites (>=) o no (>).
+    sort : str
+        Campo por el cual ordenar ('pokedex_id', 'name', 'weight', etc.).
+    transform_func : str
+        Función de transformación en tiempo de ejecución (ej: 'invert').
+
+    Context Context:
+    ----------------
+    pokemons : QuerySet
+        Lista paginada/limitada de objetos Pokemon filtrados.
+    total_found : int
+        Cantidad total de registros que coinciden antes del corte (limit).
+    filters : dict
+        Estado actual de los filtros para mantener la persistencia en la UI.
+    """
     PokeService.sync_data()
 
     # --- 1. Captura de Filtros ---
