@@ -1,6 +1,6 @@
 {% load static %}
 
-<!-- Estructura del Loader (Estilos en style.css) -->
+<!-- Estructura del Loader -->
 <div id="oak-loader-overlay">
     <div class="oak-spinner"></div>
     <div id="oak-loader-msg" class="oak-loading-text">Procesando...</div>
@@ -39,7 +39,6 @@
                 .catch(err => {
                     console.error("Error de sincronización:", err);
                     msg.innerText = "Error de conexión. Intente recargar.";
-                    // Opcional: Podrías agregar un botón de reintentar aquí
                 });
         }
 

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from ..models import Pokemon  # Usamos .. para subir un nivel
+from ..models import Pokemon
 
 class PokemonModelTest(TestCase):
     def test_pokemon_str(self):

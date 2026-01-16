@@ -1,7 +1,7 @@
 <script>
     /**
      * Valida que solo sean números, evita dobles puntos y 
-     * CORTE el texto si supera los 6 caracteres.
+     * corta el texto si supera los 6 caracteres.
      */
     function forceNumeric(input) {
         // 1. Limpieza de caracteres no numéricos
@@ -80,7 +80,7 @@
                        placeholder="∞" value="{{ filters.max_weight }}" oninput="forceNumeric(this)">
             </div>
 
-            <!-- 5. Rango de Altura (CM) - CAMBIO AQUI -->
+            <!-- 5. Rango de Altura (CM) -->
             <div class="col-6 col-md-3">
                 <label class="form-label text-secondary small text-uppercase fw-bold">Altura Min (cm)</label>
                 <input type="text" inputmode="decimal" maxlength="6" name="min_height" class="form-control form-control-dark" 

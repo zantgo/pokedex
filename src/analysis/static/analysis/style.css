@@ -12,7 +12,7 @@ body {
     font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Navbar estilo Sci-Fi */
+/* Navbar */
 .navbar-oak {
     background: linear-gradient(90deg, #8B0000 0%, var(--oak-red) 100%);
     box-shadow: 0 4px 15px rgba(220, 10, 45, 0.4);
@@ -73,12 +73,10 @@ body {
     text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
-/* Tipos solicitados específicamente */
-.type-ground { background: #795548; color: white; }   /* Café */
-.type-fairy  { background: #29B6F6; color: #121212; text-shadow: none; } /* Celeste (Texto oscuro) */
-.type-water  { background: #01579B; color: white; }   /* Azul Oscuro */
-
-/* Resto de tipos */
+/* Tipos */
+.type-ground { background: #795548; color: white; }  
+.type-fairy  { background: #29B6F6; color: #121212; text-shadow: none; } 
+.type-water  { background: #01579B; color: white; }   
 .type-grass    { background: #3E9709; color: white; }
 .type-poison   { background: #924892; color: white; }
 .type-fire     { background: #F67F0F; color: white; }

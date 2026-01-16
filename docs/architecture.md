@@ -26,7 +26,7 @@ El flujo de la aplicación se divide en cuatro capas principales:
 
 ## Stack Tecnológico
 
-*   **Runtime:** Python 3.12 (Imagen `slim` para menor superficie de ataque).
+*   **Runtime:** Python 3.12 (Imagen `slim`).
 *   **Framework Web:** Django 6.0.1.
 *   **Base de Datos:** SQLite 3 (Integrada en Python).
 *   **Cliente HTTP:** `requests` (con manejo de sesiones y timeouts).

@@ -9,8 +9,7 @@ class PokeServiceTest(TestCase):
     @patch('analysis.services.requests')
     def test_sync_uses_env_url(self, mock_requests):
         """
-        Prueba que el servicio use la URL definida en settings (simulada aquí),
-        y no una hardcodeada.
+        Prueba que el servicio use la URL definida en settings.
         """
         mock_list_resp = Mock()
         mock_list_resp.json.return_value = {'results': []} 

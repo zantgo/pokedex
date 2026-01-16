@@ -3,7 +3,7 @@
 ## 1. Persistencia: SQLite vs PostgreSQL
 *   **Decisión:** Uso de **SQLite**.
 *   **Contexto:** El requerimiento es una herramienta de análisis local portable.
-*   **Justificación:** Elimina la necesidad de configurar un contenedor de base de datos dedicado, reduciendo el consumo de recursos de Docker y simplificando el "Cold Start" de la aplicación. Para < 10,000 registros y un solo usuario concurrente, SQLite es extremadamente performante.
+*   **Justificación:** Elimina la necesidad de configurar un contenedor de base de datos dedicado, reduciendo el consumo de recursos de Docker y simplificando el "Cold Start" de la aplicación. Para < 10,000 registros y un solo usuario concurrente, SQLite es la mejor opción.
 
 ## 2. Modelo de Datos: Tipos como String (CSV) vs Many-to-Many
 *   **Decisión:** Almacenar tipos como `CharField` ("grass, poison").

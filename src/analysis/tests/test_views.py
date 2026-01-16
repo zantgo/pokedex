@@ -15,7 +15,7 @@ class PokedexViewTest(TestCase):
         # 'medium': 50kg -> En DB debe ser 500
         Pokemon.objects.create(pokedex_id=2, name="medium", types="grass", height=10, weight=500)
         
-        # 'heavy': 100kg -> En DB debe ser 1000 (Fuera de rango superior)
+        # 'heavy': 100kg -> En DB debe ser 1000 
         Pokemon.objects.create(pokedex_id=3, name="heavy", types="rock", height=10, weight=1000)
                 
         self.client = Client()

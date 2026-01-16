@@ -13,7 +13,7 @@ El proyecto es agnóstico al sistema operativo, pero requiere las siguientes her
 
 ### Específicos por Sistema Operativo
 *   **Linux / macOS:** La herramienta `make` suele venir preinstalada.
-*   **Windows:** Se recomienda encarecidamente utilizar **WSL2 (Windows Subsystem for Linux)** o la terminal **Git Bash** para ejecutar los comandos de automatización (`make`). Si utiliza PowerShell nativo, deberá optar por la [Configuración Manual](#-configuración-manual-docker-puro).
+*   **Windows:** Se recomienda utilizar **WSL2 (Windows Subsystem for Linux)** o la terminal **Git Bash** para ejecutar los comandos de automatización (`make`). Si utiliza PowerShell nativo, deberá optar por la [Configuración Manual](#-configuración-manual-docker-puro).
 
 ---
 
@@ -21,7 +21,7 @@ El proyecto es agnóstico al sistema operativo, pero requiere las siguientes her
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone <URL_DEL_REPOSITORIO>
+    git clone https://github.com/zantgo/pokedex.git
     cd pokedex
     ```
 
