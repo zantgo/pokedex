@@ -4,7 +4,7 @@ Este repositorio aloja la infraestructura técnica **backend** y **frontend** de
 
 ---
 
-## 📚 Documentación de Ingeniería
+## 📚 Documentación
 
 Para facilitar la navegación técnica y la comprensión de las decisiones de diseño, la documentación se ha modularizado. Consulte los siguientes recursos para una visión profunda del sistema:
 
