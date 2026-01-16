@@ -75,6 +75,11 @@ class PokedexViewTest(TestCase):
 
     @patch('analysis.services.PokeService.sync_data')
     def test_reversed_name_logic(self, mock_sync):
+        """
+        Verifica la lógica de transformación de datos en tiempo de ejecución.
+        Comprueba que el atributo calculado 'transformed_value' invierta correctamente 
+        la cadena del nombre (ej: 'light' -> 'thgil') en la respuesta de la vista.
+        """
         mock_sync.return_value = None
         
         response = self.client.get('/')
@@ -85,6 +90,12 @@ class PokedexViewTest(TestCase):
 
     @patch('analysis.services.PokeService.sync_data')
     def test_view_resilience_bad_data(self, mock_sync):
+        """
+        Prueba la robustez (resilience) de la vista ante inputs corruptos o maliciosos.
+        Asegura que si el usuario envía texto (ej: 'grandote') en campos numéricos, 
+        la aplicación no se rompa (Error 500) ni lance excepciones, sino que ignore 
+        silenciosamente los filtros inválidos y devuelva resultados.
+        """
         mock_sync.return_value = None
         
         params = {

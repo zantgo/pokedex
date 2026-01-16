@@ -46,9 +46,6 @@ def pokedex_view(request):
     needs_sync : bool
         Indica al frontend si debe activar el loader inicial y llamar al endpoint de sync.
     """
-    
-    # NOTA: Se ha eliminado la llamada bloqueante a PokeService.sync_data()
-    # para permitir que el HTML cargue inmediatamente y el loader se encargue del resto.
 
     # --- 1. Captura de Filtros ---
     search_name = request.GET.get('name', '').strip()
@@ -140,7 +137,7 @@ def pokedex_view(request):
         p.types_count = len(p.type_list)
         
         # DISPLAY: DB (dm) -> CM (dm * 10)
-        p.height_cm = int(p.height * 10) # Usamos int para que se vea "170 cm"
+        p.height_cm = int(p.height * 10)
         p.weight_kg = round(p.weight / 10, 2)
 
         if transform_func == 'invert':
@@ -171,7 +168,6 @@ def pokedex_view(request):
         'total_found': total_found,
         'current_limit': limit,
         'types_options': all_types,
-        # Bandera para activar la sincronización asíncrona en el frontend
         'needs_sync': Pokemon.objects.count() < 50,
         'filters': {
             'name': search_name,

@@ -1,12 +1,11 @@
 # Makefile para Pokedex Analytics Infrastructure
-# Autor: Oak Labs Engineering Team
 
 # Variables
 DC = docker compose
 SERVICE = web
 MANAGE = python manage.py
 
-# Detectar sistema operativo para comandos específicos (Opcional, para ajustes finos)
+# Detectar sistema operativo para comandos específicos (Opcional)
 OS := $(shell uname)
 
 .PHONY: help start build up migrate test clean stop shell fix-perms
@@ -16,7 +15,7 @@ help: ## Muestra esta ayuda
 	@echo "📋 Comandos disponibles para Pokedex Infrastructure:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-start: init-env build migrate up ## 🚀 Levanta todo el entorno desde cero (Build + Migrate + Up)
+start: init-env build migrate up ## Levanta todo el entorno desde cero (Build + Migrate + Up)
 
 # --- PASOS INDIVIDUALES ---
 init-env: ## Crea el archivo .env si no existe

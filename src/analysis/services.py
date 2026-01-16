@@ -35,7 +35,7 @@ class PokeService:
         # Leemos la URL dinámicamente desde settings (.env)
         api_url: str = settings.POKEAPI_URL
 
-        print(f"--- 📡 Iniciando Sincronización con {api_url} ---")
+        print(f"--- Iniciando Sincronización con {api_url} ---")
         
         try:
             # Usamos la variable api_url en lugar de la constante fija

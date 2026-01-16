@@ -8,7 +8,6 @@ class Pokemon(models.Model):
         pokedex_id (int): Identificador único oficial en la Pokedex Nacional.
         name (str): Nombre del Pokémon en minúsculas (ej: 'bulbasaur').
         types (str): Cadena de texto con los tipos separados por coma (ej: 'grass, poison').
-                     Nota: Se usa String para simplificar la búsqueda con 'icontains'.
         height (float): Altura en decímetros.
         weight (float): Peso en hectogramos.
     """

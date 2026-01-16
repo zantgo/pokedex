@@ -4,7 +4,6 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      # Mapeamos la carpeta src local a la del contenedor
       - ./src:/app/src
     env_file:
       - .env
