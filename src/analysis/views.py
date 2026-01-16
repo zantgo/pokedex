@@ -1,9 +1,17 @@
 from django.shortcuts import render
-from django.http import HttpRequest, HttpResponse
+from django.http import JsonResponse
 from .models import Pokemon
 from .services import PokeService
 
-def pokedex_view(request: HttpRequest) -> HttpResponse:
+def sync_data_view(request):
+    """
+    Endpoint auxiliar llamado vía AJAX por el frontend (loader.html).
+    Ejecuta la sincronización en segundo plano para no congelar la carga inicial.
+    """
+    PokeService.sync_data()
+    return JsonResponse({'status': 'ok'})
+
+def pokedex_view(request):
     """
     Controlador principal del Dashboard de Análisis.
     
@@ -35,8 +43,12 @@ def pokedex_view(request: HttpRequest) -> HttpResponse:
         Cantidad total de registros que coinciden antes del corte (limit).
     filters : dict
         Estado actual de los filtros para mantener la persistencia en la UI.
+    needs_sync : bool
+        Indica al frontend si debe activar el loader inicial y llamar al endpoint de sync.
     """
-    PokeService.sync_data()
+    
+    # NOTA: Se ha eliminado la llamada bloqueante a PokeService.sync_data()
+    # para permitir que el HTML cargue inmediatamente y el loader se encargue del resto.
 
     # --- 1. Captura de Filtros ---
     search_name = request.GET.get('name', '').strip()
@@ -159,6 +171,8 @@ def pokedex_view(request: HttpRequest) -> HttpResponse:
         'total_found': total_found,
         'current_limit': limit,
         'types_options': all_types,
+        # Bandera para activar la sincronización asíncrona en el frontend
+        'needs_sync': Pokemon.objects.count() < 50,
         'filters': {
             'name': search_name,
             'type': search_type,

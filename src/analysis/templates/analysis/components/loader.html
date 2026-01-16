@@ -1,0 +1,95 @@
+{% load static %}
+
+<!-- Estructura del Loader (Estilos en style.css) -->
+<div id="oak-loader-overlay">
+    <div class="oak-spinner"></div>
+    <div id="oak-loader-msg" class="oak-loading-text">Procesando...</div>
+</div>
+
+<!-- Lógica de Control y Sincronización -->
+<script>
+    (function() {
+        const loader = document.getElementById('oak-loader-overlay');
+        const msg = document.getElementById('oak-loader-msg');
+        
+        // Función pública para activar el loader con mensaje opcional
+        window.showOakLoader = function(text) {
+            if(text) msg.innerText = text;
+            loader.classList.add('active');
+        };
+
+        // --- LÓGICA DE SINCRONIZACIÓN INICIAL (Defer Loading) ---
+        // Recibe la bandera desde la vista de Django
+        const needsSync = "{{ needs_sync|yesno:'true,false' }}";
+
+        if (needsSync === 'true') {
+            // 1. Bloquear UI inmediatamente
+            showOakLoader("Sincronizando PokeAPI...");
+            
+            // 2. Ejecutar sincronización en segundo plano
+            fetch('/sync-data/')
+                .then(response => {
+                    if(response.ok) {
+                        // 3. Recargar al terminar para mostrar los datos
+                        window.location.reload(); 
+                    } else {
+                        throw new Error('Error en respuesta del servidor');
+                    }
+                })
+                .catch(err => {
+                    console.error("Error de sincronización:", err);
+                    msg.innerText = "Error de conexión. Intente recargar.";
+                    // Opcional: Podrías agregar un botón de reintentar aquí
+                });
+        }
+
+        // --- INTERCEPCIÓN DE EVENTOS DE UI ---
+
+        // 1. Envío de Filtros
+        document.addEventListener('submit', function() {
+            window.showOakLoader("Analizando Datos...");
+        });
+        
+        // 2. Navegación (Links y Paginación)
+        document.addEventListener('click', function(e) {
+            const anchor = e.target.closest('a');
+            // Validamos que sea un link real y no un ancla interna o JS
+            if (anchor && anchor.href && !anchor.href.includes('#') && !anchor.href.includes('javascript')) {
+                // Evitar loader si abre en nueva pestaña
+                if (anchor.target !== '_blank') {
+                    window.showOakLoader("Cargando...");
+                }
+            }
+        });
+
+        // 3. Monkey Patching para funciones globales (Tabla y Ordenamiento)
+        // Se ejecuta cuando el DOM está listo para asegurar que las funciones base existan
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            if (typeof window.applyLimit === 'function') {
+                const originalLimit = window.applyLimit;
+                window.applyLimit = function(val) {
+                    window.showOakLoader("Actualizando Vista...");
+                    originalLimit(val);
+                };
+            }
+
+            if (typeof window.applySort === 'function') {
+                const originalSort = window.applySort;
+                window.applySort = function(field) {
+                    window.showOakLoader("Ordenando...");
+                    originalSort(field);
+                };
+            }
+        });
+
+        // 4. Restauración de Estado (Botón Atrás del Navegador)
+        // Oculta el loader si la página se carga desde la memoria caché (bfcache)
+        window.addEventListener('pageshow', function(e) {
+            if (e.persisted) {
+                loader.classList.remove('active');
+            }
+        });
+
+    })();
+</script>
