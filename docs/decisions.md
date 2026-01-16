@@ -24,3 +24,8 @@
 *   **Decisión:** Coerción silenciosa con `try/except` en la vista.
 *   **Contexto:** Filtros URL manipulables por el usuario.
 *   **Justificación:** En lugar de mostrar errores 500 o 400 al usuario si escribe texto en un campo numérico, el sistema simplemente ignora el filtro corrupto y devuelve resultados generales. Esto mejora la experiencia de usuario (Resilience).
+
+## 6. Estrategia de Tipado (Type Hints)
+*   **Decisión:** Tipado selectivo (Core Logic only).
+*   **Contexto:** Balance entre seguridad de tipos y agilidad de desarrollo en Python.
+*   **Justificación:** Se aplican Type Hints estrictos (`mypy` style) únicamente en capas críticas de negocio (`Models`, `Services`, `Views`) para facilitar el mantenimiento y autocompletado. Se omiten deliberadamente en Pruebas y Archivos de Configuración para mantener la flexibilidad y reducir la verbosidad en código que no es de producción.
