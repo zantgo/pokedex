@@ -128,3 +128,55 @@ class PokedexViewTest(TestCase):
         nombres = [p.name for p in pokemons]
         
         self.assertIn("decimal_mon", nombres)
+
+    @patch('analysis.services.PokeService.sync_data')
+    def test_sync_data_view_endpoint(self, mock_sync):
+        """
+        Prueba el nuevo endpoint auxiliar '/sync-data/'.
+        Debe llamar al servicio de sincronización y devolver JSON {'status': 'ok'}.
+        """
+        mock_sync.return_value = None
+        
+        response = self.client.get('/sync-data/')
+        
+        # 1. Verificar Status HTTP
+        self.assertEqual(response.status_code, 200)
+        
+        # 2. Verificar Contenido JSON
+        self.assertJSONEqual(response.content, {'status': 'ok'})
+        
+        # 3. Verificar que efectivamente llamó al servicio
+        mock_sync.assert_called_once()
+
+    def test_needs_sync_context_flag(self):
+        """
+        Prueba que la vista principal inyecta correctamente la bandera 'needs_sync'
+        en el contexto, basándose en la cantidad de registros en DB.
+        """
+        
+        # CASO A: DB con registros insuficientes (< 50)
+        # setUp crea 3 registros. 3 < 50, por tanto needs_sync debe ser True.
+        response_a = self.client.get('/')
+        self.assertTrue(
+            response_a.context['needs_sync'], 
+            "La bandera needs_sync debería ser True cuando hay < 50 registros."
+        )
+
+        # CASO B: DB Llena (>= 50)
+        # Creamos 47 registros dummy para completar 50 (3 existentes + 47 nuevos)
+        dummy_pokemons = [
+            Pokemon(
+                pokedex_id=i+100, 
+                name=f"dummy_{i}", 
+                types="normal", 
+                height=5, 
+                weight=50
+            ) for i in range(47)
+        ]
+        Pokemon.objects.bulk_create(dummy_pokemons)
+        
+        response_b = self.client.get('/')
+        self.assertFalse(
+            response_b.context['needs_sync'], 
+            "La bandera needs_sync debería ser False cuando hay >= 50 registros."
+        )

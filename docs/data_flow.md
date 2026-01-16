@@ -3,13 +3,15 @@
 Descripción del ciclo de vida de la información dentro del sistema.
 
 ## 1. Sincronización (Ingesta)
-La sincronización ocurre bajo demanda al iniciar la vista principal (`PokeService.sync_data`).
+La sincronización utiliza un patrón de **Carga Diferida (Defer Loading)** para optimizar el tiempo de respuesta inicial.
 
-1.  **Verificación:** El sistema consulta `Pokemon.objects.count()`.
-2.  **Condición:** Si el conteo es < 50, se activa la sincronización.
-3.  **Fetching (Lista):** `GET /pokemon?limit=50`.
-4.  **Fetching (Detalle):** Se itera la lista y se realiza un `GET` por cada URL de detalle (usando `requests.Session` para reutilizar conexiones TCP).
-5.  **Persistencia:** Se utiliza `get_or_create` basado en `pokedex_id` para evitar duplicados. Los tipos se aplanan a un string (ej: `['grass', 'poison']` -> `"grass, poison"`).
+1.  **Detección:** La vista principal verifica si `Pokemon.objects.count() < 50`. Si es así, envía una bandera (`needs_sync: True`) al cliente sin bloquear el renderizado.
+2.  **Activación Cliente:** El JavaScript del componente Loader detecta la bandera, bloquea la UI con el "Overlay de Carga" y realiza una petición asíncrona (AJAX) al endpoint `/sync-data/`.
+3.  **Ingesta (Backend):** El servidor ejecuta la lógica de `PokeService`:
+    *   **Fetching (Lista):** `GET /pokemon?limit=50`.
+    *   **Fetching (Detalle):** Se itera la lista y se realiza un `GET` por cada URL de detalle (usando `requests.Session` para reutilizar conexiones TCP).
+    *   **Persistencia:** Se utiliza `get_or_create` basado en `pokedex_id` para evitar duplicados. Los tipos se aplanan a un string (ej: `['grass', 'poison']` -> `"grass, poison"`).
+4.  **Hidratación:** Al recibir la confirmación (`200 OK`), el cliente recarga la página automáticamente para visualizar los datos recién persistidos.
 
 ## 2. Consulta y Filtrado (Lectura)
 Cuando el usuario solicita el dashboard:

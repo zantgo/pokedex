@@ -15,10 +15,10 @@
 *   **Contexto:** Discrepancia entre unidades de API y unidades de visualización (Kg/Cm).
 *   **Justificación:** Se prioriza la fidelidad del dato. Almacenar el dato "crudo" permite que, si en el futuro se requiere cambiar la visualización (ej: a sistema imperial: libras/pies), la base de datos no necesita migración, solo la capa de vista cambia.
 
-## 4. Sincronización Sincrónica
-*   **Decisión:** Llamada bloqueante en la vista principal.
-*   **Contexto:** Requerimiento de "minimizar tráfico" y persistencia local.
-*   **Justificación (Trade-off):** Aunque idealmente esto iría en una tarea asíncrona (Celery), para el alcance de esta prueba técnica añade una sobrecarga de infraestructura (Redis + Worker) injustificada. La carga inicial demora unos segundos una única vez, lo cual es aceptable para un MVP.
+## 4. Sincronización Diferida (Defer Loading)
+*   **Decisión:** Carga inicial asíncrona vía AJAX.
+*   **Contexto:** Necesidad de mejorar la experiencia de usuario (UX) durante la carga inicial de datos (Cold Start), evitando la percepción de una página "congelada".
+*   **Justificación:** Se elimina el bloqueo del servidor en el primer renderizado. La vista principal carga instantáneamente y delega la sincronización al cliente mediante un endpoint ligero. Esto ofrece feedback visual inmediato (Loader) sin agregar la complejidad de infraestructura de colas de tareas (Redis/Celery).
 
 ## 5. Validación de Inputs
 *   **Decisión:** Coerción silenciosa con `try/except` en la vista.
